@@ -4,7 +4,7 @@ project(segnetics-test)
 
 if( NOT DEFINED CMAKE_BUILD_TYPE )
   set( CMAKE_BUILD_TYPE Debug CACHE STRING
-       "Choose the type of build, options are: Debug Release."
+       "Choose the type of build, options are: Debug Release MinSizeRel RelWithDebInfo."
        FORCE )
 endif()
 

@@ -8,6 +8,7 @@ if(MSVC)
 endif()
 
 include_directories(${PROJECT_NAME_STR}  src)
+include_directories(${PROJECT_NAME_STR}  include)
 
 
 file(GLOB_RECURSE PRODUCER_SRCS
