@@ -30,9 +30,10 @@ namespace sn_test {
         hz(hz)
     {}
 
-    void publisher::getValues(clock::duration /*d*/, std::vector<sample>& /*dst*/) const
+    void publisher::getValues(clock::duration d, std::vector<sample>& /*dst*/) const
     {
-
+        auto const nsamples = std::chrono::duration_cast<std::chrono::milliseconds>(d).count() * hz / 1000;
+        std::cout << nsamples << "\n";
     }
 }
 
@@ -48,11 +49,16 @@ int main()
     auto const Hz = 20;
 
     storage store;
-    producer pd(store, Hz);
+    //producer pd(store, Hz);
 
-    thread pd_thread(&producer::runGenerator, &pd);
+    //thread pd_thread(&producer::runGenerator, &pd);
 
-    this_thread::sleep_for(4s);
-    pd.exit();
-    pd_thread.join();
+    //this_thread::sleep_for(4s);
+    //pd.exit();
+    //if(pd_thread.joinable())
+    //    pd_thread.join();
+
+    publisher pb(store, Hz);
+    vector<sample> dst;
+    pb.getValues(4s, dst);
 }
