@@ -8,94 +8,51 @@
 #include <atomic>
 #include <iostream>
 #include "sample.hpp"
+#include "generator.hpp"
+#include "producer.hpp"
 
 
 namespace sn_test {
 
-    class generator {
+    class publisher {
     public:
-        generator();
-        sample newValue();
+        typedef std::chrono::steady_clock clock;
+
+        publisher(storage& store, int hz);
+        void getValues(clock::duration d, std::vector<sample>& dst) const;
     private:
-        std::mt19937 gen;
-        std::uniform_int_distribution<sample> dist;
+        storage& store;
+        const int hz;
     };
 
-    generator::generator() : 
-        gen(std::random_device()()), 
-        dist(std::numeric_limits<sample>::min(), std::numeric_limits<sample>::max())
+    publisher::publisher(storage& store, int hz) :
+        store(store),
+        hz(hz)
     {}
 
-    sample generator::newValue()
+    void publisher::getValues(clock::duration /*d*/, std::vector<sample>& /*dst*/) const
     {
-        return dist(gen);
+
     }
-
-
-    class storage {
-    public:
-        void add(const sample& sm);
-        void flush();
-    private:
-        std::deque<sample> buff;
-    };
-
-    void storage::add(const sample& sm)
-    {
-        buff.push_front(sm);
-        std::cout << sm << "\n";
-    }
-
-    void storage::flush()
-    {
-        std::cout << "dequeue size = " << buff.size() << "\n";
-    }
-
-    class producer {
-    public:
-        explicit producer(storage& stor);
-        void runGenerator(int Hz);
-        void exit();
-    private:
-        std::atomic<bool> quit = false;
-        generator gen;
-        storage& stor;
-    };
-
-    producer::producer(storage& stor) : stor(stor) {}
-
-    void producer::exit()
-    {
-        quit = true;
-    }
-
-    void producer::runGenerator(int Hz)
-    {
-        using namespace std::chrono_literals;
-        const auto sleep_ms = 1000ms / Hz;
-        while (!quit)
-        {
-            std::this_thread::sleep_for(sleep_ms);
-            stor.add(gen.newValue());
-        }
-        stor.flush();
-    }
-
 }
 
-#include <iostream>
 
 using namespace std::chrono_literals;
 using namespace std;
 using namespace sn_test;
 
 
+
 int main()
 {
+    auto const Hz = 20;
+
     storage store;
-    producer pd(store);
-    thread pd_thread(&producer::runGenerator, &pd, 50);
-    this_thread::sleep_for(2s);
+    producer pd(store, Hz);
+
+    thread pd_thread(&producer::runGenerator, &pd);
+
+    this_thread::sleep_for(4s);
     pd.exit();
     pd_thread.join();
 }

@@ -8,7 +8,8 @@ namespace sn_test {
     typedef int sample;
 
     using std::to_string;
-    sample stosm(const std::string& s)
+
+    inline sample stosm(const std::string& s)
     {
         return std::stoi(s);
     }

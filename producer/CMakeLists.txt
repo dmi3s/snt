@@ -14,6 +14,7 @@ include_directories(${PROJECT_NAME_STR}  include)
 file(GLOB_RECURSE PRODUCER_SRCS
          RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
          ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp
          ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
 
 add_executable(${PROJECT_NAME_STR} ${PRODUCER_SRCS})
