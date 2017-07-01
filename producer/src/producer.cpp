@@ -3,8 +3,7 @@
 
 namespace sn_test {
 
-    producer::producer(storage& stor, int freq) : 
-        stor(stor),
+    producer::producer(int freq) : 
         period(std::chrono::milliseconds(1000) / freq),
         last_value_time(clock::duration::zero())
     {}
@@ -19,6 +18,11 @@ namespace sn_test {
         quit = true;
     }
 
+    void producer::connect(std::function<void(sample)> fn)
+    {
+        sig.connect(fn);
+    }
+
     void producer::run()
     {
         while (!quit)
@@ -26,10 +30,10 @@ namespace sn_test {
             const auto time_to_sleep = last_value_time + period - clock::now();
             if (time_to_sleep.count() > 0)
                 std::this_thread::sleep_for(time_to_sleep);
-            stor.add(gen.newValue());
+            sig(gen.newValue());
             last_value_time = clock::now();
         }
-        stor.flush();
+        sig.disconnect_all_slots();
     }
 
 

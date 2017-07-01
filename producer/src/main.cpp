@@ -52,10 +52,11 @@ using namespace sn_test;
 
 int main()
 {
-    auto const freq = 20;
+    auto const freq = 50;
 
     storage store;
-    producer prod(store, freq);
+    producer prod(freq);
+    prod.connect( [&](sample sm) { store.add(sm); } );
 
     auto pd_ftr = async(std::launch::async, &producer::run, &prod);
     this_thread::sleep_for(4s);

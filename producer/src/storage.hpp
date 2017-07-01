@@ -5,6 +5,8 @@
 #include <vector>
 #include <atomic>
 #include <limits>
+#include <condition_variable>
+#include <mutex>
 #include "sample.hpp"
 
 namespace sn_test {
