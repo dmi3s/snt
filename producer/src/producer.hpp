@@ -13,7 +13,7 @@ namespace sn_test {
     public:
         producer(int freq);
 
-        void run();
+        void threadFn();
         void exit();
 
         int getFreq() const;

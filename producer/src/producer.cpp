@@ -23,18 +23,19 @@ namespace sn_test {
         sig.connect(fn);
     }
 
-    void producer::run()
+    void producer::threadFn()
     {
         while (!quit)
         {
             const auto time_to_sleep = last_value_time + period - clock::now();
             if (time_to_sleep.count() > 0)
                 std::this_thread::sleep_for(time_to_sleep);
+
             sig(gen.newValue());
+
             last_value_time = clock::now();
         }
         sig.disconnect_all_slots();
     }
-
 
 }

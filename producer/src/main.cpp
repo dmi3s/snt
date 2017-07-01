@@ -7,6 +7,7 @@
 #include <deque>
 #include <atomic>
 #include <iostream>
+#include <sstream>
 
 #include <functional>
 
@@ -49,20 +50,40 @@ using namespace std;
 using namespace sn_test;
 
 
+namespace {
+    std::string createStoreDirName(int freq)
+    {
+        return "store [" + to_string(freq) + "] - " + to_string(chrono::steady_clock::now().time_since_epoch().count());
+    }
+}
 
 int main()
 {
     auto const freq = 50;
 
-    storage store;
-    producer prod(freq);
-    prod.connect( [&](sample sm) { store.add(sm); } );
+    storage store( createStoreDirName(freq) );
+    producer signal_simulator(freq);
+    signal_simulator.connect( [&](sample sm) { store.add(sm); } );
 
-    auto pd_ftr = async(std::launch::async, &producer::run, &prod);
+    auto store_ft = async(std::launch::async, &storage::threadFn, &store);
+    auto sim_ft = async(std::launch::async, &producer::threadFn, &signal_simulator);
+
     this_thread::sleep_for(4s);
-    prod.exit();
-    pd_ftr.wait();
 
+    signal_simulator.exit();
+    store.exit();
+
+    try {
+        store_ft.get(); // wait + exception
+        sim_ft.get(); 
+    }
+    catch (const exception& e)
+    {
+        cerr << "FAILURE: " << e.what() << endl;
+        char ch;
+        cin >> ch;
+        return -1;
+    }
 
     //publisher pb(store, Hz);
     //vector<sample> dst;
