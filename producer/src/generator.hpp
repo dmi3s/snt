@@ -10,16 +10,12 @@ namespace sn_test {
 
     class generator {
     public:
-        explicit generator(int hz);
+        explicit generator();
         sample newValue();
     private:
         std::mt19937 gen;
         std::uniform_int_distribution<sample> dist;
 
-        typedef std::chrono::steady_clock clock;
-
-        const clock::duration period;
-        clock::time_point last_value_time;
     };
 
 }

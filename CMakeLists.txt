@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.2)
+cmake_minimum_required (VERSION 3.8)
 
 project(segnetics-test)
 
@@ -12,9 +12,10 @@ endif()
 set(OUTPUT_DIR ${CMAKE_BINARY_DIR})
 
 find_package(Threads REQUIRED)
+find_package(Boost 1.64 REQUIRED filesystem)
 
 ### Boost ###
-#set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREAD ON)  # enable multithreading
 
 include_directories(

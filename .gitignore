@@ -4,7 +4,9 @@ mbuild
 build
 .vscode
 *~?
+.~*
 .user
 *.orig
 Win32
+x64
 

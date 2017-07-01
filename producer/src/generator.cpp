@@ -1,22 +1,17 @@
-#include <thread>
 #include "generator.hpp"
 
 namespace sn_test {
 
-    generator::generator(int hz) :
+    generator::generator() :
         gen(std::random_device()()),
-        dist(std::numeric_limits<sample>::min(), std::numeric_limits<sample>::max()),
-        period(std::chrono::milliseconds(1000) / hz),
-        last_value_time(clock::duration::zero())
+        dist(std::numeric_limits<sample>::min(), std::numeric_limits<sample>::max())
     {}
 
     sample generator::newValue()
     {
-        const auto time_to_sleep = last_value_time + period - clock::now() ;
-        if (time_to_sleep.count() > 0)
-            std::this_thread::sleep_for(time_to_sleep);
-        last_value_time = clock::now();
-        return dist(gen);
+        static sample sm{ 0 };
+        return sm++;
+        //return dist(gen);
     }
 
 
