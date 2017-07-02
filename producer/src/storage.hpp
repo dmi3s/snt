@@ -28,7 +28,6 @@ namespace sn_test {
     class storage final : public istorage {
     public:
         const size_t BUF_SIZE = sizeof(sample) * 10;
-        const size_t BUF_MAX_ELEMS = BUF_SIZE / sizeof(sample);
 
         explicit storage(const std::string& dir);
 
@@ -44,6 +43,7 @@ namespace sn_test {
         storage& operator=(const storage&) = delete;
 
     private:
+        const size_t BUF_MAX_ELEMS = BUF_SIZE / sizeof(sample);
 
         std::atomic<bool> quit = false;
         size_t total_samples = 0;

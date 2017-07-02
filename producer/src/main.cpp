@@ -1,16 +1,4 @@
-#include <thread>
-#include <chrono>
-#include <random>
-#include <limits>
-#include <string>
-#include <condition_variable>
-#include <deque>
-#include <atomic>
 #include <iostream>
-#include <sstream>
-
-#include <functional>
-
 #include <future>
 
 #include "sample.hpp"
@@ -19,13 +7,6 @@
 #include "publisher.hpp"
 
 
-namespace sn_test {
-
-
-}
-
-
-using namespace std::chrono_literals;
 using namespace std;
 using namespace sn_test;
 
@@ -39,11 +20,11 @@ namespace {
 
 int main()
 {
-    auto const freq = 50;
+    auto const FREQ = 50;
 
-    auto store              = make_shared<storage>( createStoreDirName(freq) );
-    auto signal_simulator   = make_shared<producer>(freq);
-    auto pub                = make_shared<publisher>(store, freq);
+    auto store              = make_shared<storage>( createStoreDirName(FREQ) );
+    auto signal_simulator   = make_shared<producer>(FREQ);
+    auto pub                = make_shared<publisher>(store, signal_simulator->getFreq());
 
     signal_simulator->connect( [&](sample sm) { store->add(sm); } );
 

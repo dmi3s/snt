@@ -18,11 +18,23 @@ using namespace std;
 using namespace sn_test;
 
 namespace {
+
     fs::path getProducer(const char* consumer)
     {
         fs::path producer(consumer);
         return producer.parent_path() / "producer.exe";
     }
+
+#ifdef  _WINDOWS
+    // Windows specific end of line
+    bp::ipstream& getline(bp::ipstream& in, std::string& str)
+    {
+        std::getline(in, str);
+        if (!str.empty() && str.back() == '\r') 
+            str.pop_back();
+        return in;
+    }
+#endif
 
     void skip2EOS(bp::ipstream& is)
     {
@@ -30,15 +42,6 @@ namespace {
         while (line != "EOS")
             getline(is, line);
     }
-
-    bp::ipstream& getline(bp::ipstream& in, std::string& str)
-    {
-        std::getline(in, str);
-        if (!str.empty() && str.back() == '\r') // Windows specific text line
-            str.pop_back();
-        return in;
-    }
-
 
     vector<sample> processAnswer(const string& first_line, bp::ipstream& is)
     {
