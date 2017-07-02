@@ -21,6 +21,8 @@ namespace sn_test {
         void save(std::shared_ptr<std::deque<sample>> buff, size_t last_sample);
         size_t loadLastSamples(std::vector<sample>& v, size_t n_samples) const;
 
+        chunk_list(const chunk_list&) = delete;
+        chunk_list& operator=(const chunk_list&) = delete;
     private:
 
         struct chunk {

@@ -119,7 +119,6 @@ namespace sn_test {
 
     void storage::flush()
     {
-        std::cout << "total samples = " << total_samples << "\n";
         unique_lock<mutex> buff_lock(buff_access);
         if (!buff->empty())
         {

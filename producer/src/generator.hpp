@@ -10,7 +10,7 @@ namespace sn_test {
 
     class generator {
     public:
-        explicit generator();
+        generator();
         sample newValue();
     private:
         std::mt19937 gen;

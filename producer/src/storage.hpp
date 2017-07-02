@@ -15,20 +15,30 @@
 
 namespace sn_test {
 
-    class storage {
+    class istorage {
+    public:
+        virtual void threadFn() = 0;
+        virtual void add(sample sm) =0;
+        virtual std::vector<sample> getLast(size_t n_samples) const = 0;
+        virtual void exit() = 0;
+        virtual ~istorage() {}
+    };
+
+
+    class storage final : public istorage {
     public:
         const size_t BUF_SIZE = sizeof(sample) * 10;
         const size_t BUF_MAX_ELEMS = BUF_SIZE / sizeof(sample);
 
         explicit storage(const std::string& dir);
 
-        void add(sample sm);
+        void add(sample sm) override;
 
-        std::vector<sample> getLast(size_t n_samples) const;
+        std::vector<sample> getLast(size_t n_samples) const override;
 
-        void exit();
+        void exit() override;
 
-        void threadFn();
+        void threadFn() override;
 
     private:
 
