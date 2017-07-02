@@ -20,6 +20,7 @@ set(Boost_USE_MULTITHREAD ON)  # enable multithreading
 
 include_directories(
     ${Boost_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
     )
 
 link_directories(
@@ -33,6 +34,7 @@ link_directories(
 if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+    add_definitions(-D_WIN32_WINNT=0x0A00) # Target is windows 10
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4503 /MP")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")

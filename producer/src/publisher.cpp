@@ -24,6 +24,7 @@ namespace sn_test {
                 const size_t milliseconds = stoul(s);
                 if (milliseconds == 0)
                 {
+                    cout << "EOF\n";
                     atExit();
                     return;
                 }
