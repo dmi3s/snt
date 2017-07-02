@@ -19,7 +19,7 @@ namespace sn_test {
         chunk_list(const std::string& working_directory);
 
         void save(std::shared_ptr<std::deque<sample>> buff, size_t last_sample);
-        size_t loadLastSamples(std::vector<sample>& v, size_t n_samples);
+        size_t loadLastSamples(std::vector<sample>& v, size_t n_samples) const;
 
     private:
 
@@ -28,7 +28,7 @@ namespace sn_test {
             size_t nsamples;
         };
 
-        size_t loadChunk(std::vector<sample>& dst, size_t last_sample, size_t samples_to_load);
+        size_t loadChunk(std::vector<sample>& dst, size_t last_sample, size_t samples_to_load) const;
 
         mutable std::mutex list_mutex;
         std::deque<chunk> list;

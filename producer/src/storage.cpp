@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <cassert>
+#include <iterator>
+#include <algorithm>
 
 namespace sn_test {
 
@@ -31,12 +33,12 @@ namespace sn_test {
             save_task_cv.wait(lock, [&] () { return quit || !save_tasks_queue.empty(); });
             while (!save_tasks_queue.empty())
             {
-                const auto task = save_tasks_queue.front();
+                const auto task = *save_tasks_queue.begin();
                 lock.unlock();
                 try {
                     chunks.save(task.buff, task.last_sample);
                     lock.lock();
-                    save_tasks_queue.pop();
+                    save_tasks_queue.pop_front();
                 }
                 catch (const exception& e)
                 {
@@ -53,7 +55,7 @@ namespace sn_test {
         std::swap(buff, samples2save);
         buff_lock.unlock();
         unique_lock<mutex> lock(save_tasks_mutex);
-        save_tasks_queue.push(save_task{ samples2save, total_samples });
+        save_tasks_queue.push_back(save_task{ samples2save, total_samples });
         lock.unlock();
         save_task_cv.notify_one();
     }
@@ -69,13 +71,48 @@ namespace sn_test {
         {
             enqueBuffer2Chunk(move(buff_lock));
         }
-        cout << sm << "\n";
+        //cout << sm << "\n";
+    }
+
+
+    size_t storage::collect(std::vector<sample>& r, const storage::container& q, size_t rest)
+    {
+        const size_t nelems = min(q.size(), rest);
+        auto b = q.begin(), e = b;
+        advance(e, nelems);
+        copy(b, e, back_inserter(r));
+        return nelems;
     }
 
     std::vector<sample> storage::getLast(size_t n_samples) const
     {
         std::vector<sample> result;
-        n_samples;
+        result.reserve(n_samples);
+        auto rest = n_samples;
+
+        // first copy from buffer
+        unique_lock<mutex> buff_lock(buff_access);
+        assert(buff);
+        rest -= collect(result, *buff, rest);
+        if (rest == 0)
+            return result;
+
+        unique_lock<mutex> task_lock(save_tasks_mutex);
+        buff_lock.unlock();
+
+        // then process qued tasks
+
+        for (auto& t : save_tasks_queue)
+        {
+            rest -= collect(result, *(t.buff), rest);
+            if (rest == 0)
+                return result;
+        }
+        task_lock.unlock();
+
+        // and finally go through chunks
+        chunks.loadLastSamples(result, rest);
+
         return result;
     }
 

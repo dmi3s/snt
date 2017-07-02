@@ -55,6 +55,13 @@ namespace {
     {
         return "store [" + to_string(freq) + "] - " + to_string(chrono::steady_clock::now().time_since_epoch().count());
     }
+
+    void dbg_print(const vector<sample>& v)
+    {
+        cout << "========\n";
+        for (auto s : v)
+            cout << s << "\n";
+    }
 }
 
 int main()
@@ -69,6 +76,11 @@ int main()
     auto sim_ft = async(std::launch::async, &producer::threadFn, &signal_simulator);
 
     this_thread::sleep_for(4s);
+    //auto v = store.getLast(10); dbg_print(v);
+    //this_thread::sleep_for(1s);
+    //v = store.getLast(30); dbg_print(v);
+    //this_thread::sleep_for(1s);
+    //v = store.getLast(100); dbg_print(v);
 
     signal_simulator.exit();
     store.exit();
@@ -84,5 +96,6 @@ int main()
         cin >> ch;
         return -1;
     }
-
+    cout << "Enter to exit\n";
+    cin.get();
 }

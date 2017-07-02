@@ -30,7 +30,7 @@ namespace sn_test {
         list.push_front(chunk{last_sample, buff->size()});
     }
 
-    size_t chunk_list::loadChunk(std::vector<sample>& dst, size_t last_sample, size_t samples_to_load)
+    size_t chunk_list::loadChunk(std::vector<sample>& dst, size_t last_sample, size_t samples_to_load) const
     {
         const auto chunk_name = fs::path(working_dir) / (to_wstring(last_sample) + L".chunk");
         fstream in(chunk_name.string(), fstream::in);
@@ -48,7 +48,7 @@ namespace sn_test {
         return nsamples;
     }
 
-    size_t chunk_list::loadLastSamples(std::vector<sample>& v, size_t n_samples)
+    size_t chunk_list::loadLastSamples(std::vector<sample>& v, size_t n_samples) const
     {
         unique_lock<mutex> lock(list_mutex);
         auto l = list;

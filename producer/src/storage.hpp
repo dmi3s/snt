@@ -17,7 +17,7 @@ namespace sn_test {
 
     class storage {
     public:
-        const size_t BUF_SIZE = 4 * 10;
+        const size_t BUF_SIZE = sizeof(sample) * 10;
         const size_t BUF_MAX_ELEMS = BUF_SIZE / sizeof(sample);
 
         explicit storage(const std::string& dir);
@@ -54,10 +54,13 @@ namespace sn_test {
             size_t last_sample;
         };
 
-        typedef std::queue<save_task, std::deque<save_task>> queue_t;
-        queue_t save_tasks_queue;
+        typedef std::deque<save_task> queue;
+        queue save_tasks_queue;
         mutable std::mutex save_tasks_mutex;
         std::condition_variable save_task_cv;
+
+    private:
+        static size_t collect(std::vector<sample>& r, const container& q, size_t rest);
 
     };
 
