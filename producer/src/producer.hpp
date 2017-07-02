@@ -11,7 +11,7 @@ namespace sn_test {
 
     class producer {
     public:
-        producer(int freq);
+        explicit producer(int freq);
 
         void threadFn();
         void exit();

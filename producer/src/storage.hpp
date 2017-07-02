@@ -40,6 +40,9 @@ namespace sn_test {
 
         void threadFn() override;
 
+        storage(const storage&) = delete;
+        storage& operator=(const storage&) = delete;
+
     private:
 
         std::atomic<bool> quit = false;
