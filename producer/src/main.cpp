@@ -85,7 +85,4 @@ int main()
         return -1;
     }
 
-    //publisher pb(store, Hz);
-    //vector<sample> dst;
-    //pb.enumValues(4s, [](sample s) {cout << to_string(s) << "\n"; });
 }

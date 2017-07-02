@@ -11,6 +11,7 @@
 #include <memory>
 #include <boost/filesystem.hpp>
 #include "sample.hpp"
+#include "chunk_list.hpp"
 
 namespace sn_test {
 
@@ -31,19 +32,21 @@ namespace sn_test {
 
     private:
 
-        const boost::filesystem::path working_dir;
-
         std::atomic<bool> quit = false;
         std::atomic<size_t> total_samples = 0;
 
         typedef std::deque<sample> container;
         typedef std::shared_ptr<container> container_ptr;
 
+        mutable std::mutex buff_access;
         container_ptr buff;
 
-        void saveChunk(container_ptr samples2save, const size_t total_samples);
+    private:
+
         void flush();
 
+        chunk_list chunks;
+        void enqueBuffer2Chunk(std::unique_lock<std::mutex>&& buff_lock);
     private:
 
         struct save_task {

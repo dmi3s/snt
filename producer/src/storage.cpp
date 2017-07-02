@@ -10,7 +10,7 @@ namespace sn_test {
     namespace fs = boost::filesystem;
 
     storage::storage(const std::string& dir) : 
-        working_dir(dir),
+        chunks(dir),
         buff(make_shared<container>())
     {
         if (!fs::exists(dir))
@@ -19,6 +19,7 @@ namespace sn_test {
 
     void storage::exit() {
         quit = true;
+        flush();
         save_task_cv.notify_all();
     }
 
@@ -33,54 +34,48 @@ namespace sn_test {
                 const auto task = save_tasks_queue.front();
                 lock.unlock();
                 try {
-                    saveChunk(task.buff, task.last_sample);
+                    chunks.save(task.buff, task.last_sample);
+                    lock.lock();
+                    save_tasks_queue.pop();
                 }
                 catch (const exception& e)
                 {
                     cerr << "ERROR! Failed to save " << task.buff->size() << "samples from " << task.last_sample << ": " << e.what() << endl;
                 }
-                lock.lock();
-                save_tasks_queue.pop();
             }
         }
 
     }
 
+    void storage::enqueBuffer2Chunk(unique_lock<mutex>&& buff_lock)
+    {
+        container_ptr samples2save = make_shared<container>();
+        std::swap(buff, samples2save);
+        buff_lock.unlock();
+        unique_lock<mutex> lock(save_tasks_mutex);
+        save_tasks_queue.push(save_task{ samples2save, total_samples });
+        lock.unlock();
+        save_task_cv.notify_one();
+    }
+
     void storage::add(sample sm)
     {
+        unique_lock<mutex> buff_lock(buff_access);
         assert(buff);
         buff->push_front(sm);
         ++total_samples;
 
         if (buff->size() == BUF_MAX_ELEMS)
         {
-            container_ptr samples2save = make_shared<container>();
-            std::swap(buff, samples2save);
-            const save_task st{ samples2save, total_samples };
-            unique_lock<mutex> lock(save_tasks_mutex);
-            save_tasks_queue.push(st);
+            enqueBuffer2Chunk(move(buff_lock));
         }
         cout << sm << "\n";
-    }
-
-    void storage::saveChunk(container_ptr samples2save, const size_t nsamples)
-    {
-        const auto tmp_name = fs::path(working_dir) / fs::unique_path();
-        fstream out(tmp_name.string(), fstream::out | fstream::trunc);
-        if (!out.is_open())
-            throw fstream::failure("Failed to open file " + tmp_name.string());
-        out << samples2save->size() << "\n";
-        for (auto s : *samples2save)
-            out << s << "\n";
-        out.close();
-        const auto chunk_name = fs::path(working_dir) / (to_wstring(nsamples) + L".chunk");
-        fs::rename(tmp_name, chunk_name);
     }
 
     std::vector<sample> storage::getLast(size_t n_samples) const
     {
         std::vector<sample> result;
-        result.reserve(n_samples);
+        n_samples;
         return result;
     }
 
@@ -88,11 +83,10 @@ namespace sn_test {
     void storage::flush()
     {
         std::cout << "total samples = " << total_samples << "\n";
+        unique_lock<mutex> buff_lock(buff_access);
         if (!buff->empty())
         {
-            container_ptr samples2save = make_shared<container>();
-            std::swap(*buff, *samples2save);
-            saveChunk(samples2save, total_samples);
+            enqueBuffer2Chunk(move(buff_lock));
         }
     }
 
