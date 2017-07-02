@@ -43,7 +43,7 @@ namespace sn_test {
     private:
 
         std::atomic<bool> quit = false;
-        std::atomic<size_t> total_samples = 0;
+        size_t total_samples = 0;
 
         typedef std::deque<sample> container;
         typedef std::shared_ptr<container> container_ptr;

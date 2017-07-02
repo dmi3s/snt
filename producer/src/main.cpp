@@ -53,9 +53,9 @@ int main()
         store->exit();
     });
 
-    auto store_ft = async(std::launch::async, &istorage::threadFn, store);
-    auto sim_ft =   async(std::launch::async, &producer::threadFn, signal_simulator);
-    auto pub_ft =   async(std::launch::async, &publisher::threadFn, pub);
+    auto store_ft = async(std::launch::async, &istorage::threadFn,  store);
+    auto sim_ft   = async(std::launch::async, &producer::threadFn,  signal_simulator);
+    auto pub_ft   = async(std::launch::async, &publisher::threadFn, pub);
 
     try {
         // wait + exception
