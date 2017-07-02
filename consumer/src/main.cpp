@@ -31,6 +31,15 @@ namespace {
             getline(is, line);
     }
 
+    bp::ipstream& getline(bp::ipstream& in, std::string& str)
+    {
+        std::getline(in, str);
+        if (!str.empty() && str.back() == '\r') // Windows specific text line
+            str.pop_back();
+        return in;
+    }
+
+
     vector<sample> processAnswer(const string& first_line, bp::ipstream& is)
     {
         vector<sample> samples;
@@ -42,6 +51,8 @@ namespace {
             while (n_samples > 0)
             {
                 getline(is, line);
+                if (line.empty())
+                    continue;
                 samples.push_back(stosm(line));
                 --n_samples;
             }
@@ -84,7 +95,7 @@ int main(int /*argc*/, char* argv[])
     {
         cout << "mS> ";
         getline(cin, str);
-        in << str;
+        in << str << endl;
         getline(out, str);
         if (str == "EOF")
         {
@@ -93,8 +104,9 @@ int main(int /*argc*/, char* argv[])
         }
         auto samples = processAnswer(str, out);
         cout << "Number of samples: " << samples.size() << "\n";
+        size_t i = 0;
         for (auto s : samples)
-            cout << "[" << setw(3) << "]: " << setw(16) << s << "\n";
+            cout << "[" << i++ << "]: " << setw(16) << s << "\n";
     }
 }
 

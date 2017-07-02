@@ -24,7 +24,7 @@ namespace sn_test {
                 const size_t milliseconds = stoul(s);
                 if (milliseconds == 0)
                 {
-                    cout << "EOF\n";
+                    cout << "EOF" << endl;
                     atExit();
                     return;
                 }
@@ -38,8 +38,7 @@ namespace sn_test {
             {
                 cerr << "ERROR! " << e.what() << endl;
             }
-            cout << "EOS\n";
-            cout.flush();
+            cout << "EOS" << endl;
         }
     }
 
