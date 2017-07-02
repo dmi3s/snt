@@ -15,7 +15,7 @@ namespace sn_test {
         chunks(dir),
         buff(make_shared<container>())
     {
-        if (!fs::exists(dir))
+        if (!fs::exists(dir) || !fs::is_directory(dir))
             fs::create_directory(dir);
     }
 
