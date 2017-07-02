@@ -21,8 +21,14 @@ namespace {
 
     fs::path getProducer(const char* consumer)
     {
+        const auto module_name =
+#ifdef _WINDOWS
+            "producer.exe";
+#else
+            "producer";
+#endif
         fs::path producer(consumer);
-        return producer.parent_path() / "producer.exe";
+        return producer.parent_path() / module_name;
     }
 
 #ifdef  _WINDOWS
@@ -80,10 +86,10 @@ int main(int /*argc*/, char* argv[])
     const auto ppath = getProducer(argv[0]);
     cout << "Starting producer \"" << ppath.string() << "\"\n";
     
-    bp::opstream in;
-    bp::ipstream out;
+    bp::opstream out;
+    bp::ipstream in;
 
-    bp::child c(ppath, bp::std_out > out, bp::std_in < in);
+    bp::child c(ppath, bp::std_out > in, bp::std_in < out);
 
     if (!c.running())
     {
@@ -98,14 +104,14 @@ int main(int /*argc*/, char* argv[])
     {
         cout << "mS> ";
         getline(cin, str);
-        in << str << endl;
-        getline(out, str);
+        out << str << endl;
+        getline(in, str);
         if (str == "EOF")
         {
             cout << "Bye-bye!\n";
             return 0;
         }
-        auto samples = processAnswer(str, out);
+        auto samples = processAnswer(str, in);
         cout << "Number of samples: " << samples.size() << "\n";
         size_t i = 0;
         for (auto s : samples)

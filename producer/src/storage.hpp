@@ -27,7 +27,7 @@ namespace sn_test {
 
     class storage final : public istorage {
     public:
-        const size_t BUF_SIZE = sizeof(sample) * 10;
+        const size_t BUF_SIZE = sizeof(sample) * 128;
 
         explicit storage(const std::string& dir);
 

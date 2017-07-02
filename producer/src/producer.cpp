@@ -10,7 +10,8 @@ namespace sn_test {
 
     int producer::getFreq() const
     {
-        return static_cast<int>( std::chrono::microseconds(1000) / period );
+        const auto fq = ( std::chrono::milliseconds(1'000) / period );
+        return static_cast<int>(fq);
     }
 
     void producer::exit()
