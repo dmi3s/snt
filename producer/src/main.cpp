@@ -39,7 +39,10 @@ int main()
     auto pub_ft   = async(std::launch::async, &publisher::threadFn, pub);
 
     try {
-        // wait + exception
+        // Yes, I know that there is no garantee about execution on different threads.
+        // But in real life it is. You may say that this 'hack' or 'kostyl', but it works.
+        // I'm not going to use this decisison in a real applicatitons. It looks good only for test.
+
         store_ft.get(); 
         sim_ft.get(); 
         pub_ft.get();

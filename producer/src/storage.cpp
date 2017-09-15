@@ -20,8 +20,8 @@ namespace sn_test {
     }
 
     void storage::exit() {
-        quit = true;
         flush();
+        quit = true;
         save_task_cv.notify_all();
     }
 
