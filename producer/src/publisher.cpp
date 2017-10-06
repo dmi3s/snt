@@ -14,7 +14,7 @@ namespace sn_test {
         freq(freq)
     {}
 
-    void publisher::threadFn()
+    void publisher::threadFn(std::shared_ptr<std::promise<void>> pr)
     {
         string s;
         while (true)
@@ -26,6 +26,7 @@ namespace sn_test {
                 {
                     cout << "EOF" << endl;
                     atExit();
+                    pr->set_value();
                     return;
                 }
                 auto const nsamples = milliseconds * freq / 1000;
@@ -36,7 +37,9 @@ namespace sn_test {
             }
             catch (const exception& e)
             {
-                cerr << "ERROR! " << e.what() << endl;
+                pr->set_exception(make_exception_ptr(e));
+                atExit();
+                return;
             }
             cout << "EOS" << endl;
         }

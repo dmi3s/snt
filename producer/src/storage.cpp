@@ -25,7 +25,7 @@ namespace sn_test {
         save_task_cv.notify_all();
     }
 
-    void storage::threadFn()
+    void storage::threadFn(std::shared_ptr<std::promise<void>> pr )
     {
         while (!quit)
         {
@@ -34,19 +34,20 @@ namespace sn_test {
             while (!save_tasks_queue.empty())
             {
                 const auto task = *save_tasks_queue.begin();
+                save_tasks_queue.pop_front();
                 lock.unlock();
                 try {
                     chunks.save(task.buff, task.last_sample);
                     lock.lock();
-                    save_tasks_queue.pop_front();
                 }
                 catch (const exception& e)
                 {
-                    cerr << "ERROR! Failed to save " << task.buff->size() << "samples from " << task.last_sample << ": " << e.what() << endl;
+                    pr->set_exception(make_exception_ptr(e));
+                    return;
                 }
             }
         }
-
+        pr->set_value();
     }
 
     void storage::enqueBuffer2Chunk(unique_lock<mutex>&& buff_lock)

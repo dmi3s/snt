@@ -20,7 +20,7 @@ namespace sn_test {
 
         void onExit(std::function<void()> exit_fn);
 
-        void threadFn();
+        void threadFn(std::shared_ptr<std::promise<void>> pr);
 
     private:
         void atExit();

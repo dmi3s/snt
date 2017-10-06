@@ -9,6 +9,7 @@
 #include <queue>
 #include <mutex>
 #include <memory>
+#include <future>
 #include <boost/filesystem.hpp>
 #include "sample.hpp"
 #include "chunk_list.hpp"
@@ -17,7 +18,7 @@ namespace sn_test {
 
     class istorage {
     public:
-        virtual void threadFn() = 0;
+        virtual void threadFn( std::shared_ptr<std::promise<void>> pr ) = 0;
         virtual void add(sample sm) =0;
         virtual std::vector<sample> getLast(size_t n_samples) const = 0;
         virtual void exit() = 0;
@@ -37,7 +38,7 @@ namespace sn_test {
 
         void exit() override;
 
-        void threadFn() override;
+        void threadFn(std::shared_ptr<std::promise<void>>) override;
 
         storage(const storage&) = delete;
         storage& operator=(const storage&) = delete;

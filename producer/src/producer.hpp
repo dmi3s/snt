@@ -13,7 +13,7 @@ namespace sn_test {
     public:
         explicit producer(int freq);
 
-        void threadFn();
+        void threadFn( std::shared_ptr<std::promise<void>> pr );
         void exit();
 
         int getFreq() const;
@@ -33,6 +33,7 @@ namespace sn_test {
 
         generator gen;
         std::atomic<bool> quit = false;
+
     };
 
 }

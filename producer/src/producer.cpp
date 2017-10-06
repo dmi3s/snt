@@ -24,7 +24,7 @@ namespace sn_test {
         sig.connect(fn);
     }
 
-    void producer::threadFn()
+    void producer::threadFn(std::shared_ptr<std::promise<void>> pr)
     {
         while (!quit)
         {
@@ -37,6 +37,7 @@ namespace sn_test {
             last_value_time = clock::now();
         }
         sig.disconnect_all_slots();
+        pr->set_value();
     }
 
 }

@@ -34,21 +34,38 @@ int main()
         store->exit();
     });
 
-    auto store_ft = async(std::launch::async, &istorage::threadFn,  store);
-    auto sim_ft   = async(std::launch::async, &producer::threadFn,  signal_simulator);
-    auto pub_ft   = async(std::launch::async, &publisher::threadFn, pub);
+    vector<thread> threads;
+    threads.reserve(3);
+    vector<future<void>> features;
+    features.reserve(3);
+
+    {
+        auto pr = make_shared<promise<void>>();
+        features.push_back(pr->get_future());
+        threads.emplace_back( [pr, store]() { store->threadFn(pr); } );
+    }
+
+    {
+        auto pr = make_shared<promise<void>>();
+        features.push_back(pr->get_future());
+        threads.emplace_back([pr, signal_simulator]() { signal_simulator->threadFn(pr); });
+    }
+
+    {
+        auto pr = make_shared<promise<void>>();
+        features.push_back(pr->get_future());
+        threads.emplace_back([pr, pub]() { pub->threadFn(pr); });
+    }
 
     try {
-        // Yes, I know that there is no garantee about execution on different threads.
-        // But in real life it is. You may say that this 'hack' or 'kostyl', but it works.
-        // I'm not going to use this decisison in a real applicatitons. It looks good only for test.
-
-        store_ft.get(); 
-        sim_ft.get(); 
-        pub_ft.get();
+        for (auto& ft : features)
+            ft.get();
     }
     catch (const exception& e)
     {
         cerr << "FAILURE: " << e.what() << endl;
     }
+
+    for (auto& th : threads)
+        th.join();
 }
